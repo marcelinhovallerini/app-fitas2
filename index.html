@@ -1,0 +1,760 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#171715">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nocturne">
+<title>Nocturne — Gravador</title>
+
+<style>
+:root {
+  --fundo: #11110f;
+  --corpo: #292925;
+  --texto: #d5cbb4;
+  --vermelho: #a43a31;
+  --verde: #b8c69b;
+  --ambar: #d6b86d;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  min-height: 100%;
+  background: var(--fundo);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: max(12px, env(safe-area-inset-top)) 12px
+           max(12px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at center, #292720 0%, #11110f 75%);
+  color: var(--texto);
+  font-family: "Courier New", monospace;
+}
+
+.aparelho {
+  width: 100%;
+  max-width: 420px;
+  padding: 15px;
+  border: 1px solid #56554b;
+  border-radius: 19px;
+  background: linear-gradient(145deg, #3a3932, #1b1b18 75%);
+  box-shadow: 0 20px 50px #000b, inset 0 1px #777568;
+  position: relative;
+  overflow: hidden;
+}
+
+.aparelho::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: .07;
+  background: repeating-linear-gradient(
+    0deg, transparent 0 3px, #fff 4px, transparent 5px
+  );
+}
+
+.cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 2px 13px;
+  border-bottom: 1px solid #555449;
+}
+
+.marca {
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  letter-spacing: .2em;
+  font-size: 12px;
+}
+
+.modelo {
+  color: #969181;
+  font-size: 9px;
+  letter-spacing: .1em;
+}
+
+.titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 13px;
+}
+
+h1 {
+  font-family: Arial, sans-serif;
+  font-size: clamp(20px, 6vw, 25px);
+  letter-spacing: .12em;
+  margin: 0;
+}
+
+.subtitulo {
+  margin-top: 6px;
+  font-size: 9px;
+  color: #9d9684;
+  letter-spacing: .12em;
+}
+
+.indicador {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 9px;
+  color: #aaa18d;
+}
+
+.led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #49211d;
+}
+
+.led.ligado {
+  background: #f04436;
+  box-shadow: 0 0 10px #e73c30;
+}
+
+.compartimento {
+  padding: 11px;
+  border: 2px solid #5c5a50;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #10100f, #25251f);
+  box-shadow: inset 0 3px 10px #000;
+}
+
+.texto-compartimento {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  font-size: 8px;
+  letter-spacing: .1em;
+  color: #898577;
+  margin: 0 1px 10px;
+}
+
+.cassete {
+  position: relative;
+  min-height: 174px;
+  padding: 10px;
+  overflow: hidden;
+  border-radius: 5px;
+  border: 1px solid #d0c5aa;
+  background: linear-gradient(140deg, #bcb29a, #817a69 55%, #aaa18b);
+  color: #282720;
+  box-shadow: inset 0 0 0 3px #625d51, 0 2px 5px #0008;
+}
+
+.etiqueta-topo {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid #686151;
+  font-size: 8px;
+  font-weight: bold;
+  letter-spacing: .08em;
+  position: relative;
+  z-index: 1;
+}
+
+.alerta {
+  color: #84271f;
+}
+
+.bobinas {
+  height: 91px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.bobina {
+  width: 65px;
+  height: 65px;
+  border: 5px solid #292923;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    #3d3b33 0deg 13deg,
+    #8c8472 14deg 26deg,
+    #34332d 27deg 39deg
+  );
+  box-shadow: 0 0 0 3px #625c4e, inset 0 0 0 3px #a69b83;
+  display: grid;
+  place-items: center;
+}
+
+.miolo {
+  width: 21px;
+  height: 21px;
+  border: 4px solid #b4a990;
+  border-radius: 50%;
+  background: #292925;
+}
+
+.bobina.girando {
+  animation: girar .65s linear infinite;
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+
+.janela-fita {
+  height: 12px;
+  position: absolute;
+  bottom: 15px;
+  left: 24%;
+  right: 24%;
+  background: #292820;
+  border: 2px solid #5b5547;
+  border-radius: 3px;
+}
+
+.etiqueta-baixo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  z-index: 1;
+  font-size: 8px;
+  letter-spacing: .06em;
+}
+
+.carimbo {
+  background: #292820;
+  color: #d8ceb5;
+  padding: 4px;
+  text-align: center;
+}
+
+.painel {
+  margin: 13px 0;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  background: #101612;
+  border: 1px solid #474a3c;
+  border-radius: 4px;
+  box-shadow: inset 0 0 10px #000;
+}
+
+.rotulo-display {
+  font-size: 8px;
+  color: #7f8a74;
+  letter-spacing: .12em;
+  margin-bottom: 7px;
+}
+
+.estado {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--verde);
+}
+
+.contador {
+  color: var(--ambar);
+  font-size: clamp(23px, 7vw, 30px);
+  letter-spacing: .07em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 8px #b38c3d55;
+}
+
+.medidor {
+  display: flex;
+  align-items: end;
+  gap: 3px;
+  height: 22px;
+  margin-top: 4px;
+}
+
+.medidor span {
+  width: 5px;
+  height: 7px;
+  background: #414c3b;
+}
+
+.medidor span:nth-child(2),
+.medidor span:nth-child(5) { height: 12px; }
+
+.medidor span:nth-child(3),
+.medidor span:nth-child(6) { height: 17px; }
+
+.medidor span:nth-child(4),
+.medidor span:nth-child(7) { height: 22px; }
+
+.medidor.ativo span {
+  animation: nivel .4s ease-in-out infinite alternate;
+  background: #b1c780;
+}
+
+.medidor.ativo span:nth-child(even) {
+  animation-delay: .2s;
+}
+
+@keyframes nivel {
+  from { opacity: .35; transform: scaleY(.4); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+
+.botoes {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.botao {
+  min-width: 0;
+  min-height: 65px;
+  padding: 7px 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #111;
+  border-radius: 5px;
+  color: #d6cdb8;
+  background: linear-gradient(#48473f, #252520);
+  box-shadow: inset 0 1px #656357, 0 3px 0 #111;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.botao:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px #656357, 0 1px 0 #111;
+}
+
+.botao svg {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+}
+
+.botao span {
+  font-size: 8px;
+  letter-spacing: .05em;
+}
+
+.botao.play {
+  background: linear-gradient(#963e33, #5d211d);
+  color: #f5d9c8;
+}
+
+.botao.stop {
+  color: #edb8a9;
+}
+
+.rodape {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #4a4941;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  color: #898271;
+  font-size: 8px;
+  letter-spacing: .05em;
+}
+
+.parafuso {
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+  border-radius: 50%;
+  background: #5b5a51;
+  box-shadow: inset 0 1px 2px #111;
+}
+
+.aviso {
+  text-align: center;
+  font-size: 9px;
+  color: #9a8e78;
+  line-height: 1.5;
+  margin: 12px 4px 1px;
+}
+
+@media (max-height: 690px) {
+  body { align-items: flex-start; }
+  .aparelho { padding: 11px; }
+  .titulo { margin: 10px 0; }
+  .cassete { min-height: 145px; }
+  .bobinas { height: 69px; }
+  .bobina { width: 55px; height: 55px; }
+  .botao { min-height: 56px; }
+  .rodape { margin-top: 12px; }
+}
+
+
+.seletor {
+  margin-top: 13px;
+  padding: 11px;
+  background: #1a1a17;
+  border: 1px solid #514f44;
+  border-radius: 5px;
+}
+
+.seletor-titulo {
+  color: #969080;
+  font-size: 9px;
+  letter-spacing: .15em;
+  margin-bottom: 9px;
+}
+
+.fitas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.fita {
+  min-height: 42px;
+  border: 1px solid #555247;
+  border-radius: 4px;
+  background: linear-gradient(#393831, #22221e);
+  color: #b5ad99;
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+  letter-spacing: .05em;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fita.selecionada {
+  color: #f0d8c5;
+  border-color: #b35a47;
+  background: linear-gradient(#71352c, #42211c);
+  box-shadow: inset 0 0 8px #0005, 0 0 5px #8d342744;
+}
+
+.fita:active {
+  transform: translateY(1px);
+}
+
+</style>
+</head>
+
+<body>
+<main class="aparelho">
+  <div class="cabecalho">
+    <span class="marca">NOCTURNE AUDIO</span>
+    <span class="modelo">TAPE DECK · 1987</span>
+  </div>
+
+  <header class="titulo">
+    <div>
+      <h1>GRAVADOR</h1>
+      <div class="subtitulo">ARQUIVO RECUPERADO Nº 001</div>
+    </div>
+    <div class="indicador">
+      <span class="led" id="led"></span>
+      <span id="energia">STANDBY</span>
+    </div>
+  </header>
+
+  <section class="compartimento">
+    <div class="texto-compartimento">
+      <span>CASSETTE / TYPE I</span>
+      <span>ANALOG SOUND</span>
+    </div>
+
+    <div class="cassete">
+      <div class="etiqueta-topo">
+        <span>PROPRIEDADE DESCONHECIDA</span>
+        <span class="alerta">NÃO APAGAR</span>
+      </div>
+
+      <div class="bobinas">
+        <div class="bobina" id="bobina1"><div class="miolo"></div></div>
+        <div class="bobina" id="bobina2"><div class="miolo"></div></div>
+      </div>
+
+      <div class="janela-fita"></div>
+
+      <div class="etiqueta-baixo">
+        <span>FACE A</span>
+        <span class="carimbo">OUÇA COM ATENÇÃO</span>
+        <span>60 MIN</span>
+      </div>
+    </div>
+  </section>
+
+
+  
+  <section class="seletor">
+    <div class="seletor-titulo">SELECIONE A FITA</div>
+    <div class="fitas">
+      <button class="fita selecionada" data-fita="0">FITA 01</button>
+      <button class="fita" data-fita="1">FITA 02</button>
+      <button class="fita" data-fita="2">FITA 03</button>
+    </div>
+  </section>
+
+  <section class="painel" aria-live="polite">
+    <div>
+      <div class="rotulo-display">ESTADO DA FITA</div>
+      <div class="estado" id="estado">PRONTO PARA REPRODUZIR</div>
+      <div class="medidor" id="medidor">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <div>
+      <div class="rotulo-display">CONTADOR</div>
+      <div class="contador" id="contador">00:00</div>
+    </div>
+  </section>
+
+  <div class="botoes">
+    <button class="botao" id="rebobinar" aria-label="Rebobinar">
+      <svg viewBox="0 0 24 24"><path d="M11 5v14L1 12zm11 0v14L12 12z"/></svg>
+      <span>REW</span>
+    </button>
+
+    <button class="botao" id="pausar" aria-label="Pausar">
+      <svg viewBox="0 0 24 24"><path d="M5 4h5v16H5zm9 0h5v16h-5z"/></svg>
+      <span>PAUSE</span>
+    </button>
+
+    <button class="botao play" id="reproduzir" aria-label="Reproduzir">
+      <svg viewBox="0 0 24 24"><path d="M5 3v18L21 12z"/></svg>
+      <span>PLAY</span>
+    </button>
+
+    <button class="botao stop" id="parar" aria-label="Parar">
+      <svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/></svg>
+      <span>STOP</span>
+    </button>
+
+    <button class="botao" id="ejetar" aria-label="Ejetar fita">
+      <svg viewBox="0 0 24 24"><path d="M12 4 2 16h20zM3 19h18v2H3z"/></svg>
+      <span>EJECT</span>
+    </button>
+  </div>
+
+  <div class="rodape">
+    <span><i class="parafuso"></i> MADE IN THE DARK</span>
+    <span>⚠ SINAL INSTÁVEL</span>
+    <span class="parafuso"></span>
+  </div>
+
+  <p class="aviso">Algumas gravações não deveriam ter sido preservadas.</p>
+
+  <!-- Os áudios ficam na pasta audio, ao lado deste HTML. -->
+  <audio id="audio1" preload="auto" src="222.mp3"></audio>
+  <audio id="audio2" preload="auto" src="aniversario2.mp3"></audio>
+  <audio id="audio3" preload="auto" src="dia12.mp3"></audio>
+</main>
+
+
+<script>
+const audios = [
+  document.getElementById("audio1"),
+  document.getElementById("audio2"),
+  document.getElementById("audio3")
+];
+
+const estado = document.getElementById("estado");
+const contador = document.getElementById("contador");
+const led = document.getElementById("led");
+const energia = document.getElementById("energia");
+const medidor = document.getElementById("medidor");
+const bobinas = [
+  document.getElementById("bobina1"),
+  document.getElementById("bobina2")
+];
+const botoesFita = document.querySelectorAll(".fita");
+
+let indice = 0;
+let pausado = false;
+let ejetado = false;
+let quadro = null;
+
+function mostrarEstado(texto) {
+  estado.textContent = texto;
+}
+
+function mostrarTempo(segundos) {
+  if (!Number.isFinite(segundos) || segundos < 0) segundos = 0;
+
+  contador.textContent =
+    String(Math.floor(segundos / 60)).padStart(2, "0") + ":" +
+    String(Math.floor(segundos % 60)).padStart(2, "0");
+}
+
+function visualAtivo(ativo) {
+  led.classList.toggle("ligado", ativo);
+  energia.textContent = ativo ? "PLAYING" : "STANDBY";
+  medidor.classList.toggle("ativo", ativo);
+  bobinas.forEach(b => b.classList.toggle("girando", ativo));
+}
+
+function atualizarContador() {
+  const audio = audios[indice];
+  if (!audio) return;
+
+  mostrarTempo(audio.currentTime);
+
+  if (!audio.paused && !audio.ended) {
+    quadro = requestAnimationFrame(atualizarContador);
+  } else {
+    quadro = null;
+  }
+}
+
+function pararAudios(reiniciar = false) {
+  audios.forEach(audio => {
+    audio.pause();
+
+    if (reiniciar) {
+      try {
+        audio.currentTime = 0;
+      } catch (e) {}
+    }
+  });
+
+  if (quadro !== null) {
+    cancelAnimationFrame(quadro);
+    quadro = null;
+  }
+
+  pausado = false;
+  visualAtivo(false);
+}
+
+function selecionarFita(novoIndice) {
+  pararAudios(true);
+
+  indice = novoIndice;
+  ejetado = false;
+
+  botoesFita.forEach((botao, i) => {
+    botao.classList.toggle("selecionada", i === indice);
+  });
+
+  mostrarTempo(0);
+  mostrarEstado("FITA " + (indice + 1) + " SELECIONADA");
+  energia.textContent = "STANDBY";
+}
+
+async function reproduzir() {
+  if (ejetado) {
+    mostrarEstado("FITA EJETADA");
+    return;
+  }
+
+  const audio = audios[indice];
+
+  try {
+    await audio.play();
+    pausado = false;
+    visualAtivo(true);
+    mostrarEstado("REPRODUZINDO FITA " + (indice + 1));
+
+    if (quadro !== null) cancelAnimationFrame(quadro);
+    atualizarContador();
+  } catch (erro) {
+    visualAtivo(false);
+    mostrarEstado("ERRO AO LER A FITA");
+  }
+}
+
+// Escolher uma fita interrompe a reprodução anterior.
+botoesFita.forEach(botao => {
+  botao.addEventListener("click", () => {
+    selecionarFita(Number(botao.dataset.fita));
+  });
+});
+
+// PLAY reproduz somente a fita selecionada.
+document.getElementById("reproduzir").addEventListener("click", async () => {
+  if (ejetado) return;
+
+  if (pausado) {
+    await reproduzir();
+    return;
+  }
+
+  pararAudios(true);
+  await reproduzir();
+});
+
+// PAUSE pausa e permite continuar do mesmo ponto.
+document.getElementById("pausar").addEventListener("click", () => {
+  const audio = audios[indice];
+
+  if (!audio.paused) {
+    audio.pause();
+    pausado = true;
+    visualAtivo(false);
+    mostrarEstado("PAUSADO");
+  } else if (pausado) {
+    reproduzir();
+  }
+});
+
+// STOP interrompe e volta ao início da fita selecionada.
+document.getElementById("parar").addEventListener("click", () => {
+  pararAudios(true);
+  mostrarTempo(0);
+  mostrarEstado("FITA PARADA");
+});
+
+// REW rebobina a fita selecionada.
+document.getElementById("rebobinar").addEventListener("click", () => {
+  pararAudios(true);
+  ejetado = false;
+  mostrarTempo(0);
+  mostrarEstado("FITA REBOBINADA");
+});
+
+// EJECT simula a retirada da fita.
+document.getElementById("ejetar").addEventListener("click", () => {
+  pararAudios(true);
+  ejetado = true;
+  mostrarTempo(0);
+  mostrarEstado("FITA EJETADA");
+  energia.textContent = "EJECTED";
+});
+
+// Ao terminar, permanece na fita atual.
+audios.forEach((audio, i) => {
+  audio.addEventListener("ended", () => {
+    if (i !== indice) return;
+
+    visualAtivo(false);
+    mostrarTempo(audio.duration);
+    mostrarEstado("FIM DA GRAVAÇÃO");
+  });
+});
+
+// Seleção inicial.
+selecionarFita(0);
+
+</script>
+</body>
+</html>
